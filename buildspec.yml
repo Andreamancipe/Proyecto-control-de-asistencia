@@ -1,0 +1,16 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+  build:
+    commands:
+      - npm ci
+      - npm test
+artifacts:
+  files:
+    - backend/**/*
+    - frontend/**/*
+    - package.json
+    - package-lock.json
+    - Procfile

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Asistencia</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <section id="loginView" class="login-page">
+    <div class="login-left">
+      <div class="login-box">
+        <h1>Sistema de Control<br>de Asistencia</h1>
+        <h2><span class="resaltado">con Reconocimiento Facial</span></h2>
+
+        <input id="usuario" type="text" placeholder="Ingrese su usuario">
+        <input id="clave" type="password" placeholder="Ingrese su Contraseña">
+
+        <label class="remember">
+          <input type="checkbox">
+          <span>Recordar contraseña</span>
+        </label>
+
+        <button onclick="iniciarSesion()">Iniciar sesión</button>
+        <p id="loginError" class="error-text"></p>
+      </div>
+    </div>
+
+    <div class="login-right">
+      <img src="images/Login.png" alt="Login">
+    </div>
+  </section>
+
+  <!-- APP -->
+    <div id="appView" class="container hidden">
+    <aside class="sidebar">
+      <h2>Sistema Control de Asistencia</h2>
+      <button onclick="mostrarVista('dashboard')">📑 Dashboard</button>
+      <button onclick="mostrarVista('trabajador')">🧑‍💼Trabajadores</button>
+      <button onclick="mostrarVista('asistencia')">🗓️ Asistencia</button>
+      <button onclick="mostrarVista('reportes')">📊Reportes</button>
+      <button onclick="mostrarVista('turnos')">⏱️ Turnos</button>
+      <button class="logout" onclick="cerrarSesion()">🗄️ Cerrar sesión</button>
+    </aside>
+
+    <main>
+      <!-- DASHBOARD -->
+      <section id="dashboard">
+        <div class="dashboard-top">
+          <h1>Dashboard</h1>
+          <h3>PERFIL ADMINISTRADOR</h3>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <span class="card-title">Trabajadores</span>
+            <strong id="totalTrabajadores">0</strong>
+          </div>
+
+          <div class="card">
+            <span class="card-title">Trabajadores en turno</span>
+            <strong id="totalTurnosActivos">1</strong>
+          </div>
+
+          <div class="card">
+            <span class="card-title">Asistencias hoy</span>
+            <strong id="totalAsistenciasHoy">0</strong>
+          </div>
+
+          <div class="card">
+            <span class="card-title">Reportes generados</span>
+            <strong id="totalReportes">0</strong>
+          </div>
+        </div>
+
+        <div class="dashboard-table-box">
+          <div class="report-header">
+            <h2>Registro de Asistencia</h2>
+            <div>
+              <input id="fechaDashboard" type="date" aria-label="Fecha del dashboard">
+              <select id="filtroPresenciaDashboard" aria-label="Filtrar presencia">
+                <option value="todos">Todas las marcaciones</option>
+                <option value="dentro">Solo dentro de la empresa</option>
+                <option value="fuera">Solo quienes salieron</option>
+              </select>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>ID trabajador</th>
+                <th>Cédula</th>
+                <th>Nombre Trabajador</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Estado</th>
+                <th>Puntualidad</th>
+              </tr>
+            </thead>
+            <tbody id="tablaDashboard"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TURNOS -->
+      <section id="turnos" class="hidden">
+        <h1>Administrar turnos</h1>
+
+        <div class="form-grid">
+          <input id="nombreTurno" placeholder="Nombre del turno (ej. Turno 1)">
+          <input id="horaEntradaTurno" type="time" value="08:00" aria-label="Hora de entrada">
+          <input id="horaSalidaTurno" type="time" value="17:00" aria-label="Hora de salida">
+          <select id="diasTurno">
+            <option value="2,3,4,5,6">Lunes a viernes</option>
+            <option value="2,3,4,5,6,7">Lunes a sábado</option>
+            <option value="1,2,3,4,5,6,7">Todos los días</option>
+          </select>
+          <label><input id="turnoExtra" type="checkbox"> Turno extra</label>
+        </div>
+        <button onclick="crearTurno()">Agregar turno</button>
+
+        <h2>Asignar turno a empleado</h2>
+        <div class="form-grid">
+          <select id="empleadoTurno"><option value="">Seleccione empleado</option></select>
+          <select id="turnoAsignar"><option value="">Seleccione turno</option></select>
+        </div>
+        <button onclick="asignarTurno()">Asignar turno</button>
+
+        <h2>Asignaciones actuales</h2>
+        <table>
+          <thead><tr><th>Empleado</th><th>Cédula</th><th>Turno</th><th>Horario</th></tr></thead>
+          <tbody id="tablaAsignaciones"></tbody>
+        </table>
+      </section>
+
+      <!-- TRABAJADORES -->
+      <section id="trabajador" class="hidden">
+        <h1>Registrar Trabajador</h1>
+
+        <div class="form-grid">
+          <input id="nombre" placeholder="Nombre">
+          <input id="apellido" placeholder="Apellido">
+          <input id="cedula" placeholder="Cédula">
+          <input id="correo" placeholder="Correo electrónico">
+          <input id="cargo" placeholder="Cargo">
+          <input id="fechaIngreso" type="date">
+        </div>
+
+        <h3>Registro facial del trabajador</h3>
+        <div class="camera-area">
+          <video id="videoRegistro" autoplay playsinline></video>
+          <canvas id="canvasRegistro" class="hidden"></canvas>
+          <img id="previewRegistro" class="preview-img hidden" alt="Vista previa de registro">
+        </div>
+
+        <div class="form-actions">
+          <button onclick="iniciarCamaraRegistro()">Abrir cámara</button>
+          <button onclick="capturarFotoRegistro()">Tomar foto biométrica</button>
+          <button onclick="registrarTrabajador()">Registrar trabajador</button>
+        </div>
+
+        <h2>Listado de trabajadores</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Foto</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Cédula</th>
+              <th>Correo</th>
+              <th>Cargo</th>
+              <th>Fecha ingreso</th>
+              <th>Fecha registro</th>
+            </tr>
+          </thead>
+          <tbody id="tablaTrabajadores"></tbody>
+        </table>
+      </section>
+
+      <!-- ASISTENCIA -->
+      <section id="asistencia" class="hidden">
+        <h1>Registro de Asistencia</h1>
+
+        <div class="camera-area">
+          <video id="videoAsistencia" autoplay playsinline></video>
+          <canvas id="canvasAsistencia" class="hidden"></canvas>
+          <img id="previewAsistencia" class="preview-img hidden" alt="Captura de asistencia">
+        </div>
+
+        <p>Simulación de reconocimiento facial del trabajador</p>
+
+        <div class="asistencia-actions">
+          <select id="trabajadorAsistencia">
+            <option value="">Seleccione trabajador</option>
+          </select>
+          <button onclick="iniciarCamaraAsistencia()">Abrir cámara</button>
+          <button onclick="capturarFotoAsistencia()">Capturar rostro</button>
+          <button onclick="registrarAsistencia('entrada')">Registrar Entrada</button>
+          <button onclick="registrarAsistencia('salida')">Registrar Salida</button>
+        </div>
+
+        <h2>Registros recientes</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Trabajador</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Estado</th>
+              <th>Puntualidad</th>
+            </tr>
+          </thead>
+          <tbody id="tablaAsistencia"></tbody>
+        </table>
+      </section>
+
+      <!-- REPORTES -->
+      <section id="reportes" class="hidden">
+        <div class="report-header">
+          <h1>Reportes</h1>
+          <button onclick="exportarExcel()">Exportar Excel</button>
+        </div>
+
+        <div class="report-filters">
+          <input id="filtroGeneral" type="search" placeholder="Buscar por ID, cédula, empleado o estado">
+          <select id="filtroEmpleado">
+            <option value="">Todos los empleados</option>
+          </select>
+          <input id="filtroFechaDesde" type="date" aria-label="Fecha desde">
+          <input id="filtroFechaHasta" type="date" aria-label="Fecha hasta">
+          <button type="button" onclick="limpiarFiltrosReportes()">Limpiar filtros</button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Cédula</th>
+              <th>Trabajador</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Estado</th>
+              <th>Puntualidad</th>
+            </tr>
+          </thead>
+          <tbody id="tablaReportes"></tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
+
