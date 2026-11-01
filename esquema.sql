@@ -41,9 +41,12 @@ DROP TABLE IF EXISTS `trabajador_turnos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `trabajador_turnos` (
-  `trabajador_id` int NOT NULL,
+  `trabajador_id` bigint NOT NULL,
   `turno_id` int NOT NULL,
-  PRIMARY KEY (`trabajador_id`,`turno_id`)
+  PRIMARY KEY (`trabajador_id`,`turno_id`),
+  KEY `fk_trabajador_turnos_turno` (`turno_id`),
+  CONSTRAINT `fk_trabajador_turnos_trabajador` FOREIGN KEY (`trabajador_id`) REFERENCES `trabajadores` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_trabajador_turnos_turno` FOREIGN KEY (`turno_id`) REFERENCES `turnos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -96,4 +99,4 @@ CREATE TABLE `turnos` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-11-01 17:45:30
+-- Dump completed on 2026-11-01 18:06:13
